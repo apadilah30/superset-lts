@@ -77,6 +77,7 @@ yarn-error.log
 *.min.js
 test-changelog.md
 *.tsbuildinfo
+docs/static
 
 # Ignore package-lock in packages
 plugins/*/package-lock.json
