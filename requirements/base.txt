@@ -7,6 +7,8 @@
 #
 -e file:.
     # via -r requirements/base.in
+authlib>=1.0.0
+    # via manual
 alembic==1.6.5
     # via flask-migrate
 amqp==5.1.1
@@ -120,6 +122,8 @@ flask-login==0.6.3
     # via
     #   apache-superset
     #   flask-appbuilder
+flask-oidc==2.2.0
+    # via manual
 flask-migrate==3.1.0
     # via apache-superset
 flask-session==0.5.0
