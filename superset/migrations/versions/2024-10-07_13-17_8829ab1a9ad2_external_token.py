@@ -26,21 +26,26 @@ Create Date: 2024-10-07 13:17:35.228235
 revision = "8829ab1a9ad2"
 down_revision = "17fcea065655"
 
+import uuid
+
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects.postgresql import UUID
 
 
 def upgrade():
     op.create_table(
         "external_tokens",
+        sa.Column("uuid", UUID(as_uuid=True), default=uuid.uuid4),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), sa.ForeignKey("ab_user.id"), nullable=False),
         sa.Column("token", sa.Text(), nullable=False),
         sa.Column("username", sa.String(length=250), nullable=False),
         sa.Column("consumed", sa.Integer(), nullable=False, default=0),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.func.now()),
-        sa.Column("expired_at", sa.DateTime()),
-        sa.Column("consumed_at", sa.DateTime()),
+        sa.Column("consumed_on", sa.DateTime()),
+        sa.Column("created_on", sa.DateTime(), nullable=False),
+        sa.Column("expired_on", sa.DateTime()),
+        sa.Column("changed_on", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
 

@@ -14,6 +14,8 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import logging
+
 from flask import g, Response
 from flask_appbuilder.api import expose, safe
 from flask_jwt_extended.exceptions import NoAuthorizationError
@@ -23,6 +25,7 @@ from superset.views.users.schemas import UserResponseSchema
 from superset.views.utils import bootstrap_user_data
 
 user_response_schema = UserResponseSchema()
+logger = logging.getLogger()
 
 
 class CurrentUserRestApi(BaseSupersetApi):
@@ -35,6 +38,7 @@ class CurrentUserRestApi(BaseSupersetApi):
     @expose("/", methods=("GET",))
     @safe
     def get_me(self) -> Response:
+        logger.info("aku adalah meeee")
         """Get the user object corresponding to the agent making the request.
         ---
         get:

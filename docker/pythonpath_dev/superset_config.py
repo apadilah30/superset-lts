@@ -158,6 +158,11 @@ SESSION_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_DOMAIN = False
 ENABLE_TEMPLATE_PROCESSING = True
 
+
+from security_config import CustomSecurityManager
+
+CUSTOM_SECURITY_MANAGER = CustomSecurityManager
+
 #
 # Optionally import superset_config_docker.py (which will have been included on
 # the PYTHONPATH) in order to allow for local settings to be overridden

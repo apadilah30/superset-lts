@@ -13,8 +13,7 @@ class CustomAuthDBView(AuthDBView):
     @expose("/login/", methods=["GET", "POST"])
     def login(self) -> Response:
         token = request.args.get("token")
-        username = request.args.get("username")
-        if username is not None and token == "12341234":
+        if (username := request.args.get("username")) is not None:
             user = self.appbuilder.sm.find_user(username=username)
             if user is None:
                 flash("Credentials doesnt match")
@@ -32,11 +31,17 @@ class CustomAuthDBView(AuthDBView):
                         .first()
                     )
 
+                    if not externalToken:
+                        flash("User not found", "warning")
+                        return redirect(self.appbuilder.get_url_for_index)
+                    else:
+                        flash(f"Hallo {externalToken.username}", "success")
+                        login_user(user, remember=False)
+                        return redirect(self.appbuilder.get_url_for_index)
+
                 flash("Admin auto logged in", "success")
                 login_user(user, remember=False)
                 return redirect(self.appbuilder.get_url_for_index)
-        elif g.user == True and g.user.is_authenticated():
-            return redirect(self.appbuilder.get_url_for_index)
         else:
             return super().login()
 
