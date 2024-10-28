@@ -171,8 +171,8 @@ OAUTH_PROVIDERS = [
         "token_key": "access_token",
         "icon": "fa-google",
         "remote_app": {
-            "client_id": "584982168464-fgunnuv67rc4jvn3ul8e56jvrm3g31b9.apps.googleusercontent.com",
-            "client_secret": "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",
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
             "api_base_url": "https://www.googleapis.com/oauth2/v2/",
             "client_kwargs": {"scope": "email profile"},
             "access_token_url": "https://accounts.google.com/o/oauth2/token",
