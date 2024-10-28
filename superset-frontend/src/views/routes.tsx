@@ -123,6 +123,13 @@ const RowLevelSecurityList = lazy(
     ),
 );
 
+const ExternalTokenList = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "ExternalTokenList" */ 'src/pages/ExternalTokenList'
+    ),
+);
+
 type Routes = {
   path: string;
   Component: React.ComponentType;
@@ -224,6 +231,10 @@ export const routes: Routes = [
   {
     path: '/sqllab/',
     Component: SqlLab,
+  },
+  {
+    path: '/externaltoken',
+    Component: ExternalTokenList,
   },
 ];
 

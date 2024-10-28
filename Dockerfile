@@ -132,6 +132,8 @@ RUN --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt
     --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements/docker.txt
 
+RUN pip install --no-cache authlib
+
 USER superset
 ######################################################################
 # CI image...

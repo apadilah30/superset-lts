@@ -233,6 +233,7 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         "SQL Lab",
         "User Registrations",
         "User's Statistics",
+        "External Tokens",
     } | USER_MODEL_VIEWS
 
     ALPHA_ONLY_VIEW_MENUS = {
@@ -813,6 +814,7 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         self.add_permission_view_menu("can_sqllab", "Superset")
         self.add_permission_view_menu("can_view_query", "Dashboard")
         self.add_permission_view_menu("can_view_chart_as_table", "Dashboard")
+        self.add_permission_view_menu("can_view_external_token", "External Token")
 
     def create_missing_perms(self) -> None:
         """

@@ -24,6 +24,7 @@ import logging
 import os
 
 from celery.schedules import crontab
+from flask_appbuilder.security.manager import AUTH_OAUTH
 from flask_caching.backends.filesystemcache import FileSystemCache
 
 logger = logging.getLogger()
@@ -92,35 +93,44 @@ class CeleryConfig:
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True, "EMBEDDED_SUPERSET": True, "SSH_TUNNELING": True, "EMBEDDABLE_CHARTS": True, "DASHBOARD_RBAC": True}
+FEATURE_FLAGS = {
+    "ALERT_REPORTS": True,
+    "EMBEDDED_SUPERSET": True,
+    "SSH_TUNNELING": True,
+    "EMBEDDABLE_CHARTS": True,
+    "DASHBOARD_RBAC": True,
+}
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
 SQLLAB_CTAS_NO_LIMIT = True
-SECRET_KEY="phHdmv6twOMFI1lKgMd/ilKi4u239aYKmY5d/Utkjwo69KQwNrzEkwRS"
+SECRET_KEY = "phHdmv6twOMFI1lKgMd/ilKi4u239aYKmY5d/Utkjwo69KQwNrzEkwRS"
 
 PUBLIC_ROLE_LIKE = "Gamma"
 ENABLE_PROXY_FIX = True
 HTTP_HEADERS = {"X-Frame-Options": "ALLOWALL"}
 ENABLE_CORS = True
-CORS_OPTIONS = { "supports_credentials": True, "allow_headers": ["*"], "resources":["*"], "origins": ["*"] }
+CORS_OPTIONS = {
+    "supports_credentials": True,
+    "allow_headers": ["*"],
+    "resources": ["*"],
+    "origins": ["*"],
+}
 
 # CSRF Config
-WTF_CSRF_ENABLED=False
-WTF_CSRF_TIME_LIMIT = 300 # A CSRF token that expires in 5 minutes
+WTF_CSRF_ENABLED = False
+WTF_CSRF_TIME_LIMIT = 300  # A CSRF token that expires in 5 minutes
 
 # Talisman Config
 TALISMAN_ENABLED = False
 TALISMAN_CONFIG = {
-    "content_security_policy": {
-        "frame-ancestors": "*"
-    },
+    "content_security_policy": {"frame-ancestors": "*"},
     "force_https": False,
     "force_https_permanent": False,
     "frame_options": "ALLOWFROM",
-    "frame_options_allow_from": "*"
+    "frame_options_allow_from": "*",
 }
 
 # Cors Config
@@ -128,8 +138,8 @@ ENABLE_CORS = True
 CORS_OPTIONS = {
     "supports_credentials": True,
     "allow_headers": ["*"],
-    "resources":["*"],
-    "origins": "*"
+    "resources": ["*"],
+    "origins": "*",
 }
 
 # Dashboard embedding
@@ -141,11 +151,45 @@ GUEST_TOKEN_JWT_EXP_SECONDS = 3000  # 5 minutes
 
 # FAB SECURITY
 FAB_ADD_SECURITY_API = True
+AUTH_API_LOGIN_ALLOW_MULTIPLE_PROVIDERS = True
 
-SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SECURE = False
+# SESSION_COOKIE_SAMESITE = "Strict"
+# SESSION_COOKIE_DOMAIN = False
+ENABLE_TEMPLATE_PROCESSING = True
+
+SESSION_COOKIE_SAMESITE = None
 SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_DOMAIN = False
+SESSION_COOKIE_HTTPONLY = False
+WTF_CSRF_ENABLED = False
+
+# AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {
+        "name": "google",
+        "token_key": "access_token",
+        "icon": "fa-google",
+        "remote_app": {
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "api_base_url": "https://www.googleapis.com/oauth2/v2/",
+            "client_kwargs": {"scope": "email profile"},
+            "access_token_url": "https://accounts.google.com/o/oauth2/token",
+            "authorize_url": "https://accounts.google.com/o/oauth2/auth",
+        },
+    }
+]
+
+# Will allow user self registration, allowing to create Flask users from Authorized User
+AUTH_USER_REGISTRATION = True
+
+# The default user self registration role
+AUTH_USER_REGISTRATION_ROLE = "Public"
+
+from security_config import CustomSecurityManager
+
+CUSTOM_SECURITY_MANAGER = CustomSecurityManager
 
 #
 # Optionally import superset_config_docker.py (which will have been included on
