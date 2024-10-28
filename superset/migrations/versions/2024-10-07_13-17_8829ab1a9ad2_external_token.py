@@ -40,6 +40,8 @@ def upgrade():
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), sa.ForeignKey("ab_user.id"), nullable=False),
         sa.Column("token", sa.Text(), nullable=False),
+        sa.Column("tenant", sa.String(255)),
+        sa.Column("app", sa.String(255)),
         sa.Column("username", sa.String(length=250), nullable=False),
         sa.Column("consumed", sa.Integer(), nullable=False, default=0),
         sa.Column("consumed_on", sa.DateTime()),

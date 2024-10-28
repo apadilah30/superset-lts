@@ -24,6 +24,7 @@ import logging
 import os
 
 from celery.schedules import crontab
+from flask_appbuilder.security.manager import AUTH_OAUTH
 from flask_caching.backends.filesystemcache import FileSystemCache
 
 logger = logging.getLogger()
@@ -152,12 +153,39 @@ GUEST_TOKEN_JWT_EXP_SECONDS = 3000  # 5 minutes
 FAB_ADD_SECURITY_API = True
 AUTH_API_LOGIN_ALLOW_MULTIPLE_PROVIDERS = True
 
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_SAMESITE = "Strict"
-SESSION_COOKIE_DOMAIN = False
+# SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SECURE = False
+# SESSION_COOKIE_SAMESITE = "Strict"
+# SESSION_COOKIE_DOMAIN = False
 ENABLE_TEMPLATE_PROCESSING = True
 
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = False
+WTF_CSRF_ENABLED = False
+
+# AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {
+        "name": "google",
+        "token_key": "access_token",
+        "icon": "fa-google",
+        "remote_app": {
+            "client_id": "584982168464-fgunnuv67rc4jvn3ul8e56jvrm3g31b9.apps.googleusercontent.com",
+            "client_secret": "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",
+            "api_base_url": "https://www.googleapis.com/oauth2/v2/",
+            "client_kwargs": {"scope": "email profile"},
+            "access_token_url": "https://accounts.google.com/o/oauth2/token",
+            "authorize_url": "https://accounts.google.com/o/oauth2/auth",
+        },
+    }
+]
+
+# Will allow user self registration, allowing to create Flask users from Authorized User
+AUTH_USER_REGISTRATION = True
+
+# The default user self registration role
+AUTH_USER_REGISTRATION_ROLE = "Public"
 
 from security_config import CustomSecurityManager
 

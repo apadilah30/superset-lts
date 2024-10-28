@@ -14,16 +14,27 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-from . import (
-    alerts,
-    api,
-    base,
-    core,
-    css_templates,
-    dynamic_plugins,
-    external_token,
-    health,
-    sql_lab,
-    tags,
-)
-from .log import api as log_api, views
+from flask_appbuilder import permission_name
+from flask_appbuilder.api import expose
+from flask_appbuilder.security.decorators import has_access
+
+from superset.superset_typing import FlaskResponse
+
+from .base import BaseSupersetView
+
+
+class ExternalTokenView(BaseSupersetView):
+    route_base = "/externaltoken"
+    class_permission_name = "External Token"
+
+    @expose("/list/")
+    @has_access
+    @permission_name("read")
+    def list(self) -> FlaskResponse:
+        return super().render_app_template()
+
+    @expose("/<int:pk>")
+    @has_access
+    @permission_name("read")
+    def get(self, pk: int) -> FlaskResponse:  # pylint: disable=unused-argument
+        return super().render_app_template()

@@ -146,6 +146,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.explore.api import ExploreRestApi
         from superset.explore.form_data.api import ExploreFormDataRestApi
         from superset.explore.permalink.api import ExplorePermalinkRestApi
+        from superset.external_token.api import ExternalTokenRestApi
         from superset.importexport.api import ImportExportRestApi
         from superset.queries.api import QueryRestApi
         from superset.queries.saved_queries.api import SavedQueryRestApi
@@ -177,8 +178,11 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             ExcelToDatabaseView,
         )
         from superset.views.datasource.views import DatasetEditor, Datasource
+
+        # from superset.views.external_token
         from superset.views.dynamic_plugins import DynamicPluginsView
         from superset.views.explore import ExplorePermalinkView, ExploreView
+        from superset.views.external_token import ExternalTokenView
         from superset.views.key_value import KV
         from superset.views.log.api import LogRestApi
         from superset.views.log.views import LogModelView
@@ -217,6 +221,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(ExploreRestApi)
         appbuilder.add_api(ExploreFormDataRestApi)
         appbuilder.add_api(ExplorePermalinkRestApi)
+        appbuilder.add_api(ExternalTokenRestApi)
         appbuilder.add_api(ImportExportRestApi)
         appbuilder.add_api(QueryRestApi)
         appbuilder.add_api(ReportScheduleRestApi)
@@ -393,6 +398,17 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             label=__("Annotation Layers"),
             href="/annotationlayer/list/",
             icon="fa-comment",
+            category_icon="",
+            category="Manage",
+            category_label=__("Manage"),
+        )
+
+        appbuilder.add_view(
+            ExternalTokenView,
+            "External Token",
+            label=__("External Token"),
+            href="/externaltoken/list/",
+            icon="fa-lock",
             category_icon="",
             category="Manage",
             category_label=__("Manage"),
