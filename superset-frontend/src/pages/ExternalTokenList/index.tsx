@@ -22,26 +22,25 @@ import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
 import Icons from 'src/components/Icons';
 import ListView, {
   FetchDataConfig,
-  FilterOperator,
+  // FilterOperator,
   ListViewProps,
-  Filters,
+  // Filters,
 } from 'src/components/ListView';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { Tooltip } from 'src/components/Tooltip';
 import SubMenu, { SubMenuProps } from 'src/features/home/SubMenu';
 import rison from 'rison';
 import { useListViewResource } from 'src/views/CRUD/hooks';
-import RowLevelSecurityModal from 'src/features/rls/RowLevelSecurityModal';
-import { RLSObject } from 'src/features/rls/types';
-import { createErrorHandler, createFetchRelated } from 'src/views/CRUD/utils';
-import { ModifiedInfo } from 'src/components/AuditInfo';
+import ExternalTokenModal from 'src/features/externalToken/ExternalTokenModal';
+import { createErrorHandler } from 'src/views/CRUD/utils';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
+import { TokenObject } from 'src/features/externalToken/types';
 
 const Actions = styled.div`
   color: ${({ theme }) => theme.colors.grayscale.base};
 `;
 
-interface RLSProps {
+interface ExternalTokenProps {
   addDangerToast: (msg: string) => void;
   addSuccessToast: (msg: string) => void;
   user: {
@@ -51,10 +50,10 @@ interface RLSProps {
   };
 }
 
-function ExternalTokenList(props: RLSProps) {
+function ExternalTokenList(props: ExternalTokenProps) {
   const { addDangerToast, addSuccessToast, user } = props;
-  const [ruleModalOpen, setRuleModalOpen] = useState<boolean>(false);
-  const [currentRule, setCurrentRule] = useState(null);
+  const [tokenModalOpen, setTokenModalOpen] = useState<boolean>(false);
+  const [exToken, setExToken] = useState(null);
 
   const {
     state: {
@@ -67,9 +66,9 @@ function ExternalTokenList(props: RLSProps) {
     fetchData,
     refreshData,
     toggleBulkSelect,
-  } = useListViewResource<RLSObject>(
-    'rowlevelsecurity',
-    t('Row Level Security'),
+  } = useListViewResource<TokenObject>(
+    'external_token',
+    t('External Token'),
     addDangerToast,
     true,
     undefined,
@@ -78,18 +77,18 @@ function ExternalTokenList(props: RLSProps) {
   );
 
   function handleRuleEdit(rule: null) {
-    setCurrentRule(rule);
-    setRuleModalOpen(true);
+    setExToken(rule);
+    setTokenModalOpen(true);
   }
 
   function handleRuleDelete(
-    { id, name }: RLSObject,
+    { id, username, token, app, tenant }: TokenObject,
     refreshData: (arg0?: FetchDataConfig | null) => void,
     addSuccessToast: (arg0: string) => void,
     addDangerToast: (arg0: string) => void,
   ) {
     return SupersetClient.delete({
-      endpoint: `/api/v1/rowlevelsecurity/${id}`,
+      endpoint: `/api/v1/external_token/${id}`,
     }).then(
       () => {
         refreshData();
@@ -100,10 +99,11 @@ function ExternalTokenList(props: RLSProps) {
       ),
     );
   }
-  function handleBulkRulesDelete(rulesToDelete: RLSObject[]) {
+
+  function handleBulkRulesDelete(rulesToDelete: TokenObject[]) {
     const ids = rulesToDelete.map(({ id }) => id);
     return SupersetClient.delete({
-      endpoint: `/api/v1/rowlevelsecurity/?q=${rison.encode(ids)}`,
+      endpoint: `/api/v1/external_token/?q=${rison.encode(ids)}`,
     }).then(
       () => {
         refreshData();
@@ -116,8 +116,8 @@ function ExternalTokenList(props: RLSProps) {
   }
 
   function handleRuleModalHide() {
-    setCurrentRule(null);
-    setRuleModalOpen(false);
+    setExToken(null);
+    setTokenModalOpen(false);
     refreshData();
   }
 
@@ -128,36 +128,36 @@ function ExternalTokenList(props: RLSProps) {
   const columns = useMemo(
     () => [
       {
-        accessor: 'name',
-        Header: t('Name'),
+        accessor: 'username',
+        Header: t('Username'),
       },
       {
-        accessor: 'filter_type',
-        Header: t('Filter Type'),
+        accessor: 'token',
+        Header: t('Token'),
         size: 'xl',
       },
       {
-        accessor: 'group_key',
-        Header: t('Group Key'),
+        accessor: 'app',
+        Header: t('App'),
         size: 'xl',
       },
       {
-        accessor: 'clause',
-        Header: t('Clause'),
+        accessor: 'tenant',
+        Header: t('Tenant'),
       },
-      {
-        Cell: ({
-          row: {
-            original: {
-              changed_on_delta_humanized: changedOn,
-              changed_by: changedBy,
-            },
-          },
-        }: any) => <ModifiedInfo date={changedOn} user={changedBy} />,
-        Header: t('Last modified'),
-        accessor: 'changed_on_delta_humanized',
-        size: 'xl',
-      },
+      // {
+      //   Cell: ({
+      //     row: {
+      //       original: {
+      //         changed_on_delta_humanized: changedOn,
+      //         changed_by: changedBy,
+      //       },
+      //     },
+      //   }: any) => <ModifiedInfo date={changedOn} user={changedBy} />,
+      //   Header: t('Last modified'),
+      //   accessor: 'changed_on_delta_humanized',
+      //   size: 'xl',
+      // },
       {
         Cell: ({ row: { original } }: any) => {
           const handleDelete = () =>
@@ -246,62 +246,62 @@ function ExternalTokenList(props: RLSProps) {
     buttonAction: () => handleRuleEdit(null),
     buttonText: canEdit ? (
       <>
-        <i className="fa fa-plus" data-test="add-rule-empty" /> {'Rule'}{' '}
+        <i className="fa fa-plus" data-test="add-token-empty" /> {'Token'}{' '}
       </>
     ) : null,
   };
 
-  const filters: Filters = useMemo(
-    () => [
-      {
-        Header: t('Name'),
-        key: 'search',
-        id: 'name',
-        input: 'search',
-        operator: FilterOperator.StartsWith,
-      },
-      {
-        Header: t('Filter Type'),
-        key: 'filter_type',
-        id: 'filter_type',
-        input: 'select',
-        operator: FilterOperator.Equals,
-        unfilteredLabel: t('Any'),
-        selects: [
-          { label: t('Regular'), value: 'Regular' },
-          { label: t('Base'), value: 'Base' },
-        ],
-      },
-      {
-        Header: t('Group Key'),
-        key: 'search',
-        id: 'group_key',
-        input: 'search',
-        operator: FilterOperator.StartsWith,
-      },
-      {
-        Header: t('Modified by'),
-        key: 'changed_by',
-        id: 'changed_by',
-        input: 'select',
-        operator: FilterOperator.RelationOneMany,
-        unfilteredLabel: t('All'),
-        fetchSelects: createFetchRelated(
-          'rowlevelsecurity',
-          'changed_by',
-          createErrorHandler(errMsg =>
-            t(
-              'An error occurred while fetching dataset datasource values: %s',
-              errMsg,
-            ),
-          ),
-          user,
-        ),
-        paginate: true,
-      },
-    ],
-    [user],
-  );
+  // const filters: Filters = useMemo(
+  //   () => [
+  //     {
+  //       Header: t('Name'),
+  //       key: 'search',
+  //       id: 'name',
+  //       input: 'search',
+  //       operator: FilterOperator.StartsWith,
+  //     },
+  //     {
+  //       Header: t('Filter Type'),
+  //       key: 'filter_type',
+  //       id: 'filter_type',
+  //       input: 'select',
+  //       operator: FilterOperator.Equals,
+  //       unfilteredLabel: t('Any'),
+  //       selects: [
+  //         { label: t('Regular'), value: 'Regular' },
+  //         { label: t('Base'), value: 'Base' },
+  //       ],
+  //     },
+  //     {
+  //       Header: t('Group Key'),
+  //       key: 'search',
+  //       id: 'group_key',
+  //       input: 'search',
+  //       operator: FilterOperator.StartsWith,
+  //     },
+  //     {
+  //       Header: t('Modified by'),
+  //       key: 'changed_by',
+  //       id: 'changed_by',
+  //       input: 'select',
+  //       operator: FilterOperator.RelationOneMany,
+  //       unfilteredLabel: t('All'),
+  //       fetchSelects: createFetchRelated(
+  //         '_',
+  //         'changed_by',
+  //         createErrorHandler(errMsg =>
+  //           t(
+  //             'An error occurred while fetching dataset datasource values: %s',
+  //             errMsg,
+  //           ),
+  //         ),
+  //         user,
+  //       ),
+  //       paginate: true,
+  //     },
+  //   ],
+  //   [user],
+  // );
 
   const initialSort = [{ id: 'changed_on_delta_humanized', desc: true }];
   const PAGE_SIZE = 25;
@@ -312,7 +312,7 @@ function ExternalTokenList(props: RLSProps) {
     subMenuButtons.push({
       name: (
         <>
-          <i className="fa fa-plus" data-test="add-rule" /> {t('Rule')}
+          <i className="fa fa-plus" data-test="add-token" /> {t('Token')}
         </>
       ),
       buttonStyle: 'primary',
@@ -328,7 +328,7 @@ function ExternalTokenList(props: RLSProps) {
 
   return (
     <>
-      <SubMenu name={t('Row Level Security')} buttons={subMenuButtons} />
+      <SubMenu name={t('External Token')} buttons={subMenuButtons} />
       <ConfirmStatusChange
         title={t('Please confirm')}
         description={t('Are you sure you want to delete the selected rules?')}
@@ -346,14 +346,14 @@ function ExternalTokenList(props: RLSProps) {
           }
           return (
             <>
-              <RowLevelSecurityModal
-                rule={currentRule}
+              <ExternalTokenModal
+                exToken={exToken}
                 addDangerToast={addDangerToast}
                 onHide={handleRuleModalHide}
                 addSuccessToast={addSuccessToast}
-                show={ruleModalOpen}
+                show={tokenModalOpen}
               />
-              <ListView<RLSObject>
+              <ListView<TokenObject>
                 className="rls-list-view"
                 bulkActions={bulkActions}
                 bulkSelectEnabled={bulkSelectEnabled}
@@ -363,7 +363,7 @@ function ExternalTokenList(props: RLSProps) {
                 data={rules}
                 emptyState={emptyState}
                 fetchData={fetchData}
-                filters={filters}
+                // filters={filters}
                 initialSort={initialSort}
                 loading={loading}
                 addDangerToast={addDangerToast}

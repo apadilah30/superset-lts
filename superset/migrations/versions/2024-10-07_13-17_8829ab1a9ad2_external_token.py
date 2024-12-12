@@ -48,6 +48,10 @@ def upgrade():
         sa.Column("created_on", sa.DateTime(), nullable=False),
         sa.Column("expired_on", sa.DateTime()),
         sa.Column("changed_on", sa.DateTime(), nullable=False),
+        sa.Column("changed_by_fk", sa.Integer(), nullable=True),
+        sa.Column("created_by_fk", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(["changed_by_fk"], ["ab_user.id"]),
+        sa.ForeignKeyConstraint(["created_by_fk"], ["ab_user.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
 
