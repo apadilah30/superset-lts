@@ -13,7 +13,6 @@
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
-authlib>=1.0.0
 
 # flask-oidc=2.2.0
 #     # via manual
