@@ -41,15 +41,15 @@ class CreateExternalTokenCommand(BaseCommand):
         try:
             return ExternalTokenDAO.create(attributes=self._properties)
         except DAOCreateFailedError as ex:
-            logger.exception(ex.exception)
+            logger.info(f"error cuy: {ex.exception}")
             raise ExternalTokenCreateFailedError() from ex
 
     def validate(self) -> None:
         exceptions: list[ValidationError] = []
 
-        name = self._properties.get("name", "")
+        username = self._properties.get("username", "")
 
-        if not ExternalTokenDAO.validate_update_uniqueness(name):
+        if not ExternalTokenDAO.validate_update_uniqueness(username):
             exceptions.append(ExternalTokenNameUniquenessValidationError())
 
         if exceptions:

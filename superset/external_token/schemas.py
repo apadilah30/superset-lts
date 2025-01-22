@@ -35,9 +35,9 @@ openapi_spec_methods_override = {
         "get": {
             "summary": "Get a list of ExternalToken",
             "description": "Gets a list of ExternalToken, use Rison or JSON "
-            "query parameters for filtering, sorting,"
-            " pagination and for selecting specific"
-            " columns and metadata.",
+                           "query parameters for filtering, sorting,"
+                           " pagination and for selecting specific"
+                           " columns and metadata.",
         }
     },
     "delete": {"delete": {"summary": "Delete an ExternalToken"}},
@@ -57,8 +57,7 @@ class ExternalTokenListSchema(Schema):
     token = fields.String(metadata={"description": "token_description"})
     app = fields.String(metadata={"description": "app_description"})
     tenant = fields.String(metadata={"description": "tenant_description"})
-    user = fields.List(fields.Nested(UserSchema))
-    tables = fields.List(fields.Nested(TablesSchema))
+    user = fields.Nested(UserSchema)
 
 
 class ExternalTokenShowSchema(Schema):
@@ -67,8 +66,7 @@ class ExternalTokenShowSchema(Schema):
     token = fields.String(metadata={"description": "token_description"})
     app = fields.String(metadata={"description": "app_description"})
     tenant = fields.String(metadata={"description": "tenant_description"})
-    user = fields.List(fields.Nested(UserSchema))
-    tables = fields.List(fields.Nested(TablesSchema))
+    user = fields.Nested(UserSchema)
 
 
 class ExternalTokenPostSchema(Schema):
@@ -96,6 +94,13 @@ class ExternalTokenPostSchema(Schema):
         allow_none=False,
         validate=Length(1, 255)
     )
+    user_id = fields.Integer(
+        metadata={"description": "user_id_description"},
+        required=True,
+        allow_none=False,
+    )
+
+
 class ExternalTokenPutSchema(Schema):
     username = fields.String(
         metadata={"description": "username_description"},
@@ -120,4 +125,9 @@ class ExternalTokenPutSchema(Schema):
         required=False,
         allow_none=False,
         validate=Length(1, 255)
+    )
+    user_id = fields.Integer(
+        metadata={"description": "user_id_description"},
+        required=True,
+        allow_none=False,
     )

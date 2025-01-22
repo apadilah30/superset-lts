@@ -38,7 +38,6 @@ class CurrentUserRestApi(BaseSupersetApi):
     @expose("/", methods=("GET",))
     @safe
     def get_me(self) -> Response:
-        logger.info("aku adalah meeee")
         """Get the user object corresponding to the agent making the request.
         ---
         get:

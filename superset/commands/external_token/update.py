@@ -60,7 +60,7 @@ class UpdateExternalTokenCommand(BaseCommand):
             raise ExternalTokenNotFoundError()
 
         if not ExternalTokenDAO.validate_update_uniqueness(
-            name, layer_id=self._model_id
+            name, id=self._model_id
         ):
             exceptions.append(ExternalTokenNameUniquenessValidationError())
 
