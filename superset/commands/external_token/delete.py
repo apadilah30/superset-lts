@@ -50,5 +50,3 @@ class DeleteExternalTokenCommand(BaseCommand):
         self._models = ExternalTokenDAO.find_by_ids(self._model_ids)
         if not self._models or len(self._models) != len(self._model_ids):
             raise ExternalTokenNotFoundError()
-        if ExternalTokenDAO.has_annotations(self._model_ids):
-            raise ExternalTokenDeleteIntegrityError()

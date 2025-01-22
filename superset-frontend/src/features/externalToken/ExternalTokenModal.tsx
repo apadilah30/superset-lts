@@ -115,6 +115,7 @@ export interface ExternalTokenModalProps {
 type SelectValue = {
   value: string;
   label: string;
+  username: string;
 };
 
 const DEFAULT_PAYLOAD = {
@@ -122,6 +123,7 @@ const DEFAULT_PAYLOAD = {
   token: '',
   app: '',
   tenant: '',
+  user_id: ''
 };
 
 function ExternalTokenModal(props: ExternalTokenModalProps) {
@@ -143,7 +145,7 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
     clearError,
   } = useSingleViewResource<TokenObject>(
     `external_token`,
-    t('external_token'),
+    t('External Token'),
     addDangerToast,
   );
 
@@ -157,6 +159,7 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
   // * state validators *
   const validate = () => {
     if (
+      (currentToken?.user?.id || currentToken?.user_id) &&
       currentToken?.username &&
       currentToken?.token &&
       currentToken?.app &&
@@ -173,7 +176,7 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
     if (!isEditMode) {
       setCurrentToken({ ...DEFAULT_PAYLOAD });
     } else if (exToken?.id && !loading && !fetchError) {
-      fetchResource(exToken.id as number);
+      const fetchResult = fetchResource(exToken.id as number);
     }
   }, [exToken]);
 
@@ -193,10 +196,10 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
     updateTokenState(target.name, target.value);
   };
 
-  
-  const onUserChange = (user: Array<SelectValue>) => {
-    console.log(user, currentToken)
-    updateTokenState('user_id', user || null);
+
+  const onUserChange = (user: SelectValue) => {
+    updateTokenState('user_id', user.value || null);
+    updateTokenState('username', user.label || null);
   };
 
   const hide = () => {
@@ -211,7 +214,12 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
 
     if (isEditMode && currentToken.id) {
       const updateId = currentToken.id;
+      data.user_id = currentToken?.user?.id;
+      
       delete data.id;
+      delete data.user;
+
+      console.log("updateId", updateId, data)
       updateResource(updateId, data).then(response => {
         if (!response) {
           return;
@@ -242,7 +250,7 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
         }).then(response => {
           const list = response.json.result.map(
             (item: { id: number; username: string, first_name: string, last_name: string }) => ({
-              label: `${item.first_name} ${item.last_name}`,
+              label: item.username,
               value: item.id,
             }),
           );
@@ -288,9 +296,9 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
             <div className="input-container">
               <AsyncSelect
                 ariaLabel={t('Select User')}
-                mode="multiple"
+                mode="single"
                 onChange={onUserChange}
-                value={(currentToken?.user as SelectValue) || []}
+                // value={(currentToken?.user as SelectValue) || []}
                 options={loadUserOptions}
               />
             </div>
@@ -311,6 +319,7 @@ function ExternalTokenModal(props: ExternalTokenModalProps) {
               data-test="et-username-test"
               tooltipText={t('The username of the exToken must be unique')}
               hasTooltip
+              readOnly={true}
             />
           </StyledInputContainer>
           <StyledInputContainer>

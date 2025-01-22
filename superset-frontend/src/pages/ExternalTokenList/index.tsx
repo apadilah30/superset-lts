@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, styled, SupersetClient } from '@superset-ui/core';
-import React, { useMemo, useState } from 'react';
+import {t, styled, SupersetClient} from '@superset-ui/core';
+import React, {useMemo, useState} from 'react';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
 import Icons from 'src/components/Icons';
 import ListView, {
@@ -27,17 +27,17 @@ import ListView, {
   // Filters,
 } from 'src/components/ListView';
 import withToasts from 'src/components/MessageToasts/withToasts';
-import { Tooltip } from 'src/components/Tooltip';
-import SubMenu, { SubMenuProps } from 'src/features/home/SubMenu';
+import {Tooltip} from 'src/components/Tooltip';
+import SubMenu, {SubMenuProps} from 'src/features/home/SubMenu';
 import rison from 'rison';
-import { useListViewResource } from 'src/views/CRUD/hooks';
+import {useListViewResource} from 'src/views/CRUD/hooks';
 import ExternalTokenModal from 'src/features/externalToken/ExternalTokenModal';
-import { createErrorHandler } from 'src/views/CRUD/utils';
-import { QueryObjectColumns } from 'src/views/CRUD/types';
-import { TokenObject } from 'src/features/externalToken/types';
+import {createErrorHandler} from 'src/views/CRUD/utils';
+import {QueryObjectColumns} from 'src/views/CRUD/types';
+import {TokenObject} from 'src/features/externalToken/types';
 
 const Actions = styled.div`
-  color: ${({ theme }) => theme.colors.grayscale.base};
+  color: ${({theme}) => theme.colors.grayscale.base};
 `;
 
 interface ExternalTokenProps {
@@ -51,15 +51,15 @@ interface ExternalTokenProps {
 }
 
 function ExternalTokenList(props: ExternalTokenProps) {
-  const { addDangerToast, addSuccessToast, user } = props;
+  const {addDangerToast, addSuccessToast, user} = props;
   const [tokenModalOpen, setTokenModalOpen] = useState<boolean>(false);
   const [exToken, setExToken] = useState(null);
 
   const {
     state: {
       loading,
-      resourceCount: rulesCount,
-      resourceCollection: rules,
+      resourceCount: tokensCount,
+      resourceCollection: tokens,
       bulkSelectEnabled,
     },
     hasPerm,
@@ -76,13 +76,13 @@ function ExternalTokenList(props: ExternalTokenProps) {
     true,
   );
 
-  function handleRuleEdit(rule: null) {
-    setExToken(rule);
+  function handleTokenEdit(token: null) {
+    setExToken(token);
     setTokenModalOpen(true);
   }
 
-  function handleRuleDelete(
-    { id, username, token, app, tenant }: TokenObject,
+  function handleTokenDelete(
+    {id, username, token, app, tenant}: TokenObject,
     refreshData: (arg0?: FetchDataConfig | null) => void,
     addSuccessToast: (arg0: string) => void,
     addDangerToast: (arg0: string) => void,
@@ -100,8 +100,8 @@ function ExternalTokenList(props: ExternalTokenProps) {
     );
   }
 
-  function handleBulkRulesDelete(rulesToDelete: TokenObject[]) {
-    const ids = rulesToDelete.map(({ id }) => id);
+  function handleBulkTokenDelete(tokensToDelete: TokenObject[]) {
+    const ids = tokensToDelete.map(({id}) => id);
     return SupersetClient.delete({
       endpoint: `/api/v1/external_token/?q=${rison.encode(ids)}`,
     }).then(
@@ -110,12 +110,12 @@ function ExternalTokenList(props: ExternalTokenProps) {
         addSuccessToast(t(`Deleted`));
       },
       createErrorHandler(errMsg =>
-        addDangerToast(t('There was an issue deleting rules: %s', errMsg)),
+        addDangerToast(t('There was an issue deleting tokens: %s', errMsg)),
       ),
     );
   }
 
-  function handleRuleModalHide() {
+  function handleTokenModalHide() {
     setExToken(null);
     setTokenModalOpen(false);
     refreshData();
@@ -134,7 +134,7 @@ function ExternalTokenList(props: ExternalTokenProps) {
       {
         accessor: 'token',
         Header: t('Token'),
-        size: 'xl',
+        size: '2xl',
       },
       {
         accessor: 'app',
@@ -145,29 +145,20 @@ function ExternalTokenList(props: ExternalTokenProps) {
         accessor: 'tenant',
         Header: t('Tenant'),
       },
-      // {
-      //   Cell: ({
-      //     row: {
-      //       original: {
-      //         changed_on_delta_humanized: changedOn,
-      //         changed_by: changedBy,
-      //       },
-      //     },
-      //   }: any) => <ModifiedInfo date={changedOn} user={changedBy} />,
-      //   Header: t('Last modified'),
-      //   accessor: 'changed_on_delta_humanized',
-      //   size: 'xl',
-      // },
       {
-        Cell: ({ row: { original } }: any) => {
+        accessor: 'user.first_name',
+        Header: t('Alias'),
+      },
+      {
+        Cell: ({row: {original}}: any) => {
           const handleDelete = () =>
-            handleRuleDelete(
+            handleTokenDelete(
               original,
               refreshData,
               addSuccessToast,
               addDangerToast,
             );
-          const handleEdit = () => handleRuleEdit(original);
+          const handleEdit = () => handleTokenEdit(original);
           return (
             <Actions className="actions">
               {canWrite && (
@@ -193,7 +184,7 @@ function ExternalTokenList(props: ExternalTokenProps) {
                         className="action-button"
                         onClick={confirmDelete}
                       >
-                        <Icons.Trash data-test="rls-list-trash-icon" />
+                        <Icons.Trash data-test="rls-list-trash-icon"/>
                       </span>
                     </Tooltip>
                   )}
@@ -211,7 +202,7 @@ function ExternalTokenList(props: ExternalTokenProps) {
                     className="action-button"
                     onClick={handleEdit}
                   >
-                    <Icons.EditAlt data-test="edit-alt" />
+                    <Icons.EditAlt data-test="edit-alt"/>
                   </span>
                 </Tooltip>
               )}
@@ -241,12 +232,12 @@ function ExternalTokenList(props: ExternalTokenProps) {
   );
 
   const emptyState = {
-    title: t('No Rules yet'),
+    title: t('No External Token yet'),
     image: 'filter-results.svg',
-    buttonAction: () => handleRuleEdit(null),
+    buttonAction: () => handleTokenEdit(null),
     buttonText: canEdit ? (
       <>
-        <i className="fa fa-plus" data-test="add-token-empty" /> {'Token'}{' '}
+        <i className="fa fa-plus" data-test="add-token-empty"/> {'Token'}{' '}
       </>
     ) : null,
   };
@@ -303,7 +294,7 @@ function ExternalTokenList(props: ExternalTokenProps) {
   //   [user],
   // );
 
-  const initialSort = [{ id: 'changed_on_delta_humanized', desc: true }];
+  const initialSort = [{id: 'changed_on_delta_humanized', desc: true}];
   const PAGE_SIZE = 25;
 
   const subMenuButtons: SubMenuProps['buttons'] = [];
@@ -312,11 +303,11 @@ function ExternalTokenList(props: ExternalTokenProps) {
     subMenuButtons.push({
       name: (
         <>
-          <i className="fa fa-plus" data-test="add-token" /> {t('Token')}
+          <i className="fa fa-plus" data-test="add-token"/> {t('Token')}
         </>
       ),
       buttonStyle: 'primary',
-      onClick: () => handleRuleEdit(null),
+      onClick: () => handleTokenEdit(null),
     });
     subMenuButtons.push({
       name: t('Bulk select'),
@@ -328,11 +319,11 @@ function ExternalTokenList(props: ExternalTokenProps) {
 
   return (
     <>
-      <SubMenu name={t('External Token')} buttons={subMenuButtons} />
+      <SubMenu name={t('External Token')} buttons={subMenuButtons}/>
       <ConfirmStatusChange
         title={t('Please confirm')}
-        description={t('Are you sure you want to delete the selected rules?')}
-        onConfirm={handleBulkRulesDelete}
+        description={t('Are you sure you want to delete the selected tokens?')}
+        onConfirm={handleBulkTokenDelete}
       >
         {confirmDelete => {
           const bulkActions: ListViewProps['bulkActions'] = [];
@@ -349,7 +340,7 @@ function ExternalTokenList(props: ExternalTokenProps) {
               <ExternalTokenModal
                 exToken={exToken}
                 addDangerToast={addDangerToast}
-                onHide={handleRuleModalHide}
+                onHide={handleTokenModalHide}
                 addSuccessToast={addSuccessToast}
                 show={tokenModalOpen}
               />
@@ -359,8 +350,8 @@ function ExternalTokenList(props: ExternalTokenProps) {
                 bulkSelectEnabled={bulkSelectEnabled}
                 disableBulkSelect={toggleBulkSelect}
                 columns={columns}
-                count={rulesCount}
-                data={rules}
+                count={tokensCount}
+                data={tokens}
                 emptyState={emptyState}
                 fetchData={fetchData}
                 // filters={filters}
@@ -368,7 +359,8 @@ function ExternalTokenList(props: ExternalTokenProps) {
                 loading={loading}
                 addDangerToast={addDangerToast}
                 addSuccessToast={addSuccessToast}
-                refreshData={() => {}}
+                refreshData={() => {
+                }}
                 pageSize={PAGE_SIZE}
               />
             </>

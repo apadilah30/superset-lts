@@ -6,7 +6,8 @@ export type TokenObject = {
   app?: string;
   consumed?: number;
   consumed_on?: string;
-  user?: UserObject
+  user?: UserObject;
+  user_id?: string;   
 };
 
 
