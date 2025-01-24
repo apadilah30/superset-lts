@@ -159,23 +159,23 @@ services:
     healthcheck:
       disable: true
 
-  # superset-tests-worker:
-  #   image: *superset-image
-  #   container_name: superset_tests_worker
-  #   command: ["/app/docker/docker-bootstrap.sh", "worker"]
-  #   env_file: docker/.env
-  #   environment:
-  #     DATABASE_HOST: localhost
-  #     DATABASE_DB: test
-  #     REDIS_CELERY_DB: 2
-  #     REDIS_RESULTS_DB: 3
-  #     REDIS_HOST: localhost
-  #   network_mode: host
-  #   depends_on: *superset-depends-on
-  #   user: *superset-user
-  #   volumes: *superset-volumes
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "celery inspect ping -A superset.tasks.celery_app:app -d celery@$$HOSTNAME"]
+  superset-tests-worker:
+    image: *superset-image
+    container_name: superset_tests_worker
+    command: [ "/app/docker/docker-bootstrap.sh", "worker" ]
+    env_file: docker/.env
+    environment:
+      DATABASE_HOST: localhost
+      DATABASE_DB: test
+      REDIS_CELERY_DB: 2
+      REDIS_RESULTS_DB: 3
+      REDIS_HOST: localhost
+    network_mode: host
+    depends_on: *superset-depends-on
+    user: *superset-user
+    volumes: *superset-volumes
+    healthcheck:
+      test: [ "CMD-SHELL", "celery inspect ping -A superset.tasks.celery_app:app -d celery@$$HOSTNAME"]
 
 volumes:
   superset_home:
