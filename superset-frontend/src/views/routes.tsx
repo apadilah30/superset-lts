@@ -137,7 +137,7 @@ type Routes = {
   props?: React.ComponentProps<any>;
 }[];
 
-export const routes: Routes = [
+export const routes: Routes = [ 
   {
     path: '/superset/welcome/',
     Component: Home,
@@ -262,6 +262,7 @@ const frontEndRoutes = routes
 export function isFrontendRoute(path?: string) {
   if (path) {
     const basePath = path.split(/[?#]/)[0]; // strip out query params and link bookmarks
+    console.log('basePath', basePath)
     return !!frontEndRoutes[basePath];
   }
   return false;

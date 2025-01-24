@@ -26,6 +26,8 @@ import os
 from celery.schedules import crontab
 from flask_appbuilder.security.manager import AUTH_OAUTH
 from flask_caching.backends.filesystemcache import FileSystemCache
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from superset import app
 
 logger = logging.getLogger()
 
@@ -101,7 +103,7 @@ FEATURE_FLAGS = {
     "DASHBOARD_RBAC": True,
 }
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
-WEBDRIVER_BASEURL = "http://superset:8088/"
+WEBDRIVER_BASEURL = "http://localhost/cafeins-dashboard/"
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
@@ -182,10 +184,22 @@ OAUTH_PROVIDERS = [
 ]
 
 # Will allow user self registration, allowing to create Flask users from Authorized User
-AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION = False
 
 # The default user self registration role
 AUTH_USER_REGISTRATION_ROLE = "Public"
+
+APP_ROOT = '/cafeins-dashboard/'
+APP_URL = '/cafeins-dashboard/'
+BASE_URL = '/cafeins-dashboard/'
+APPLICATION_ROOT = '/cafeins-dashboard/'
+STATIC_ASSETS_PREFIX = '/cafeins-dashboard'
+
+application = DispatcherMiddleware(app, {
+    '/cafeins-dashboard': app
+})
+
+APP_ICON = '/cafeins-dashboard/static/assets/images/logo-header-cafeins.png'
 
 from security_config import CustomSecurityManager
 
