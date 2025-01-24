@@ -54,6 +54,7 @@ const boundActions = bindActionCreators({ logEvent }, store.dispatch);
 const LocationPathnameLogger = () => {
   const location = useLocation();
   useEffect(() => {
+    console.log("route changing: ", location.pathname)
     // This will log client side route changes for single page app user navigation
     boundActions.logEvent(LOG_ACTIONS_SPA_NAVIGATION, {
       path: location.pathname,
@@ -68,8 +69,10 @@ const LocationPathnameLogger = () => {
   return <></>;
 };
 
+console.log(isFrontendRoute)
+
 const App = () => (
-  <Router>
+  <Router basename="cafeins-dashboard">
     <ScrollToTop />
     <LocationPathnameLogger />
     <RootContextProviders>
